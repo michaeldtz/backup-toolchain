@@ -75,10 +75,10 @@ func initFileWriter(chn <-chan FileEntry, outFile string, scanId string) {
 		}
 
 		if strings.HasSuffix(outFile, ".csv") {
-			csvLineToWrite := fmt.Sprint(scanId, ",", entry.toCSVString())
+			csvLineToWrite := fmt.Sprint(scanId, ",", entry.ToCSVString())
 			file.Write([]byte(csvLineToWrite))
 		} else if strings.HasSuffix(outFile, ".json") {
-			jsonLineToWrite := entry.toJSON(scanId)
+			jsonLineToWrite := entry.ToJSON(scanId)
 			file.Write(jsonLineToWrite)
 			file.Write([]byte("\n"))
 		}
