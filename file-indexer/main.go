@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/base64"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"io"
@@ -31,10 +33,10 @@ func executeOnDir(chn chan<- FileEntry, path string, doClose bool) {
 			check(err)
 			defer fileReader.Close()
 
-			hasher := NewHasher()
+			hasher := NewMD5Hasher()
 			io.Copy(hasher, fileReader)
 			hash := hasher.Sum()
-
+			hashB64 := base64.StdEncoding.EncodeToString([]byte(hex.EncodeToString(hash)))
 			pathParts := strings.Split(path, "/")
 			dirName := pathParts[len(pathParts)-1]
 
@@ -44,7 +46,7 @@ func executeOnDir(chn chan<- FileEntry, path string, doClose bool) {
 				Size:     fileInfo.Size(),
 				Path:     path,
 				Dirname:  dirName,
-				Hash:     hash,
+				Hash:     hashB64,
 			}
 			chn <- fileEntry
 		}
@@ -75,7 +77,7 @@ func initFileWriter(chn <-chan FileEntry, outFile string, scanId string) {
 		}
 
 		if strings.HasSuffix(outFile, ".csv") {
-			csvLineToWrite := fmt.Sprint(scanId, ",", entry.ToCSVString())
+			csvLineToWrite := entry.ToCSVString(scanId)
 			file.Write([]byte(csvLineToWrite))
 		} else if strings.HasSuffix(outFile, ".json") {
 			jsonLineToWrite := entry.ToJSON(scanId)

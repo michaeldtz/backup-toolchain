@@ -14,7 +14,7 @@ func NewCRCHasher() *Hasher {
 
 }
 
-func NewHasher() *Hasher {
+func NewMD5Hasher() *Hasher {
 
 	return &Hasher{
 		h: md5.New(),
@@ -27,8 +27,7 @@ type Hasher struct {
 }
 
 func (c *Hasher) Write(p []byte) (n int, err error) {
-	c.h.Write(p)
-	return
+	return c.h.Write(p)
 }
 
 func (c *Hasher) Sum() []byte {
